@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { RegionsModule } from './regions/regions.module';
+import { AppController } from '../controllers/app.controller';
+import { RegionModule } from './region.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -11,11 +11,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_SCHEMA,
-      entities: [
-        __dirname + '/**/*.entity{.ts,.js}',
-      ]
+      entities: [__dirname + '/../entities/*.entity{.ts,.js}'],
     }),
-    RegionsModule
+    RegionModule,
   ],
   controllers: [AppController],
 })

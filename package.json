@@ -5,6 +5,10 @@
   "author": "",
   "license": "MIT",
   "scripts": {
+    "models:migrate": "typeorm-model-generator -h localhost -d data_tube -u root -x root -e mysql -o ./src/entities --ce pascal --cp camel --noConfig && npm run format",
+    "models:init": "rm -rf src/entities/ && npm run models:migrate && node formatEntities.js",
+    "db:init": "node importDb.js",
+    "build:models": "npm run db:init && npm run models:init",
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
@@ -32,11 +36,12 @@
     "typeorm": "^0.2.16"
   },
   "devDependencies": {
+    "@nestjs/testing": "^6.0.0",
     "@types/express": "^4.16.0",
     "@types/jest": "^23.3.13",
     "@types/node": "^10.12.18",
     "@types/supertest": "^2.0.7",
-    "@nestjs/testing": "^6.0.0",
+    "fs": "0.0.1-security",
     "jest": "^23.6.0",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
@@ -45,6 +50,7 @@
     "ts-node": "^7.0.1",
     "tsconfig-paths": "^3.7.0",
     "tslint": "5.12.1",
+    "typeorm-model-generator": "^0.3.3",
     "typescript": "^3.2.4"
   },
   "jest": {
