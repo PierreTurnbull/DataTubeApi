@@ -4,7 +4,7 @@ const exec = require('child_process').exec;
 
 ;(async() => {
   try {
-    exec(`mysql -u ${process.env.DB_USER} -p < db.sql`, {}, (error) => {
+    exec(`mysql -u ${process.env.DB_USER} -p${process.env.DB_PASSWORD} < db.sql`, {}, (error) => {
       if (error) {
         throw error
       }

@@ -6,9 +6,11 @@
   "license": "MIT",
   "scripts": {
     "models:migrate": "typeorm-model-generator -h localhost -d data_tube -u root -x root -e mysql -o ./src/entities --ce pascal --cp camel --noConfig && npm run format",
-    "models:init": "rm -rf src/entities/ && npm run models:migrate && node formatEntities.js",
-    "db:init": "node importDb.js",
+    "models:init": "rm -rf src/entities/ && npm run models:migrate && node bin/formatEntities.js",
+    "db:init": "node bin/importDb.js",
+    "data:import": "npm run db:init && node bin/fetchData.js",
     "build:models": "npm run db:init && npm run models:init",
+    "build:data": "npm run data:import && npm run models:init",
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
@@ -43,6 +45,7 @@
     "@types/supertest": "^2.0.7",
     "fs": "0.0.1-security",
     "jest": "^23.6.0",
+    "node-querybuilder": "^1.2.2",
     "nodemon": "^1.18.9",
     "prettier": "^1.15.3",
     "supertest": "^3.4.1",
@@ -51,7 +54,8 @@
     "tsconfig-paths": "^3.7.0",
     "tslint": "5.12.1",
     "typeorm-model-generator": "^0.3.3",
-    "typescript": "^3.2.4"
+    "typescript": "^3.2.4",
+    "url-query-builder": "^3.0.0"
   },
   "jest": {
     "moduleFileExtensions": [
