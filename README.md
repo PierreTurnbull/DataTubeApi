@@ -17,7 +17,7 @@ npm run build:data
 ## Running the app
 
 ```
-npm run start:dev
+npm run start
 ```
 
 ## Test

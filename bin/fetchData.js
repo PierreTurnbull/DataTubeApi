@@ -47,7 +47,6 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
             } else {
               resolve(response)
             }
-            MySQLQueryBuilder.disconnect()
           })
         })
       })().then(
@@ -68,32 +67,36 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
       .filter(region => regionCodes.find(regionCode => regionCode === region.id))
 
     await queryMySQL('insert', 'region', regions)
+
+    let videoCategories = []
+    for (let i = 0; i < regions.length; i++) {
+      const region = regions[i]
+      let regionCategories = await fetchYoutubeData('guideCategories', {
+        part: 'snippet',
+        regionCode: region.id,
+        hl: 'fr'
+      })
+      regionCategories.forEach(regionCategory => {
+        regionHasCategory.push({
+          regionId: region.id,
+          categoryId: regionCategory.id
+        })
+        if (!videoCategories.find(category => category.id === regionCategory.id)) {
+          videoCategories.push({
+            id: regionCategory.id,
+            name: regionCategory.snippet.title
+          })
+        }
+      })
+    }
+    
+    await queryMySQL('insert', 'video_category', videoCategories)
   } catch (error) {
     console.log(chalk.red('Fatal error'))
     console.log(chalk.red('  Reason:'), error.reason)
     console.log(chalk.red('  Error message:'), error.message)
     process.exit(1)
+  } finally {
+    MySQLQueryBuilder.disconnect()
   }
-
-  // let categories = []
-  // for (let i = 0; i < regions.length; i++) {
-  //   const region = regions[i]
-  //   let regionCategories = await fetchYoutubeData('guideCategories', {
-  //     part: 'snippet',
-  //     regionCode: region.id,
-  //     hl: 'fr'
-  //   })
-  //   regionCategories.forEach(regionCategory => {
-  //     regionHasCategory.push({
-  //       regionId: region.id,
-  //       categoryId: regionCategory.id
-  //     })
-  //     if (!categories.find(category => category.id === regionCategory.id)) {
-  //       categories.push({
-  //         id: regionCategory.id,
-  //         name: regionCategory.snippet.title
-  //       })
-  //     }
-  //   })
-  // }
 })()
