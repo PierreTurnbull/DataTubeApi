@@ -10,6 +10,7 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD
 }, 'mysql', 'single');
+const locale = 'FR'
 
 // encapsulating code in a directly invoked function enables use of async/await
 ;(async () => {
@@ -20,7 +21,13 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
   }
 
   try {
-    async function fetchYoutubeData (model, query) {
+    /**
+     * Fetch data from a YouTube model
+     * @param {string} model: YouTube model to fetch
+     * @param {object} query: contains all query parameters
+     * @returns {array} list of all items retrieved
+     */
+    async function fetchYouTubeData (model, query, getMetadata = false) {
       const rootUrl = 'https://www.googleapis.com/youtube/v3'
       const apiKey = process.env.YOUTUBE_API_KEY
       const url = new URLQueryBuilder(`${rootUrl}/${model}`, Object.assign({ key: apiKey }, query))
@@ -31,13 +38,19 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
 
       await fetch(url.get())
         .then(response => response.json())
-        .then(rawData => { formattedData = rawData.items })
+        .then(rawData => { formattedData = getMetadata ? rawData : rawData.items })
         .catch(error => {
           sendCustomError(error.message, `Failed to fetch data for model '${model}'.`)
         })
       return formattedData
     }
 
+    /**
+     * Execute a query in MySQL
+     * @param {string} action: action to perform
+     * @param {string} table: table on which to perform the action
+     * @param {object} data: request payload
+     */
     async function queryMySQL (action, table, data) {
       await (async () => {
         await new Promise(async (resolve, reject) => {
@@ -55,11 +68,13 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
       )
     }
 
-    const regionCodes = [ 'FR', 'HK', 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
+    // Import regions
+
+    const regionCodes = [ 'FR' ]//, 'HK', 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
 
     let regionHasCategory = []
 
-    let regions = (await fetchYoutubeData('i18nRegions', { part: 'snippet', hl: 'fr' }))
+    let regions = (await fetchYouTubeData('i18nRegions', { part: 'snippet', hl: locale }))
       .map(region => ({
         id: region.id,
         name: region.snippet.name
@@ -68,15 +83,17 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
 
     await queryMySQL('insert', 'region', regions)
 
+    // Import video categories
+
     let videoCategories = []
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i]
-      let regionCategories = await fetchYoutubeData('guideCategories', {
+      let videoCategoriesByRegion = await fetchYouTubeData('videoCategories', {
         part: 'snippet',
         regionCode: region.id,
-        hl: 'fr'
+        hl: locale
       })
-      regionCategories.forEach(regionCategory => {
+      videoCategoriesByRegion.forEach(regionCategory => {
         regionHasCategory.push({
           regionId: region.id,
           categoryId: regionCategory.id
@@ -91,6 +108,17 @@ const MySQLQueryBuilder = require('node-querybuilder').QueryBuilder({
     }
     
     await queryMySQL('insert', 'video_category', videoCategories)
+
+    // Import languages
+
+    let languages = (await fetchYouTubeData('i18nLanguages', { part: 'snippet', hl: locale }))
+      .map(language => ({
+        id: language.id,
+        code: language.snippet.hl,
+        name: language.snippet.name
+      }))
+      
+    await queryMySQL('insert', 'language', languages)
   } catch (error) {
     console.log(chalk.red('Fatal error'))
     console.log(chalk.red('  Reason:'), error.reason)
