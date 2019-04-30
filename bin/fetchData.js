@@ -73,7 +73,7 @@ const locale = 'FR'
     // TODO : uncomment
     const regionCodes = [ 'FR' ]// , 'HK' , 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
 
-    let regionHasCategory = []
+    let videoCategoryHasRegion = []
 
     let regions = (await fetchYouTubeData('i18nRegions', { part: 'snippet', hl: locale }))
       .map(region => ({
@@ -95,9 +95,9 @@ const locale = 'FR'
         hl: locale
       })
       videoCategoriesByRegion.forEach(regionCategory => {
-        regionHasCategory.push({
-          regionId: region.id,
-          categoryId: regionCategory.id
+        videoCategoryHasRegion.push({
+          region_id: region.id,
+          video_category_id: regionCategory.id
         })
         if (!videoCategories.find(category => category.id === regionCategory.id)) {
           videoCategories.push({
@@ -109,6 +109,10 @@ const locale = 'FR'
     }
     
     await queryMySQL('insert', 'video_category', videoCategories)
+
+    // Import video_category_has_region
+
+    await queryMySQL('insert', 'video_category_has_region', videoCategoryHasRegion)
 
     // Import languages
 
