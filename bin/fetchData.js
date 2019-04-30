@@ -21,6 +21,7 @@ const locale = 'FR'
     throw customError
   }
 
+  const startTime = new Date().getTime()
   try {
     /**
      * Fetch data from a YouTube model
@@ -34,8 +35,8 @@ const locale = 'FR'
       const url = new URLQueryBuilder(`${rootUrl}/${model}`, Object.assign({ key: apiKey }, query))
       let formattedData = null
       console.log(`${chalk.green('GET')} ${url.url}`)
-      console.log(chalk.green('  Queries:'))
-      Object.keys(url.queries).forEach(queryName => console.log(`    ${queryName} = ${url.queries[queryName]}`))
+      // console.log(chalk.green('  Queries:'))
+      // Object.keys(url.queries).forEach(queryName => console.log(`    ${queryName} = ${url.queries[queryName]}`))
 
       await fetch(url.get())
         .then(response => response.json())
@@ -205,8 +206,10 @@ const locale = 'FR'
     console.log(chalk.red('Fatal error'))
     console.log(chalk.red('  Reason:'), error.reason)
     console.log(chalk.red('  Error message:'), error.message)
+    console.log(chalk.red('Time:'), new Date().getTime() - startTime + 'ms')
     process.exit(1)
   } finally {
     MySQLQueryBuilder.disconnect()
+    console.log(chalk.yellow('Time:'), new Date().getTime() - startTime + 'ms')
   }
 })()
