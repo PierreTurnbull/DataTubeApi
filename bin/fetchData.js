@@ -124,6 +124,7 @@ const locale = 'FR'
     // Import videos
 
     let videos = []
+    let tags = []
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i]
       for (let j = 0; j < 1; j++) {
@@ -172,11 +173,34 @@ const locale = 'FR'
               channel_id: video.snippet.channelId || null
             }
           }))
+          videosResponse.items.forEach(video => {
+            if (!video.snippet.tags) { return }
+            video.snippet.tags
+              .map(tag => tag.toLowerCase())
+              .forEach(videoTag => {
+                const existingTag = tags.find(tag => {
+                  return tag.name === videoTag
+                })
+                if (existingTag) {
+                  existingTag.taggedVideoIds.push(video.id)
+                } else {
+                  tags.push({
+                    id: tags.length + 1,
+                    name: videoTag,
+                    taggedVideoIds: [video.id]
+                  })
+                }
+              })
+          })
           nextPageToken = videosResponse.nextPageToken
         } while (nextPageToken)
       }
     }
     const filteredVideos = videos.filter((video, index) => videos.map(video => video.id).indexOf(video.id) >= index)
+
+    // Import tags
+
+    await queryMySQL('insert', 'tag', tags.map(tag => ({ id: tag.id, value: tag.name })))
 
     // Import channels
 
@@ -202,6 +226,15 @@ const locale = 'FR'
 
     await queryMySQL('insert', 'channel', channels)
     await queryMySQL('insert', 'video', filteredVideos)
+
+    // Import video_has_tag
+
+    await queryMySQL('insert', 'video_has_tag', tags.map(tag => 
+      tag.taggedVideoIds.map(taggedVideoId => ({
+        video_id: taggedVideoId,
+        tag_id: tag.id
+      }))
+    ).flat())
   } catch (error) {
     console.log(chalk.red('Fatal error'))
     console.log(chalk.red('  Reason:'), error.reason)
