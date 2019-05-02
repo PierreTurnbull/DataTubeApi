@@ -71,7 +71,7 @@ const locale = 'FR'
     // Import regions
 
     // TODO : uncomment
-    const regionCodes = [ 'FR' ]// , 'HK' , 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
+    const regionCodes = [ 'FR' , 'HK' ]// , 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
 
     let videoCategoryHasRegion = []
 
@@ -159,6 +159,9 @@ const locale = 'FR'
             const languageId = videoLanguageId && correspondingLanguage
               ? videoLanguageId
               : null
+            const videoCategoryId = videoCategories.find(videoCategory => videoCategory.id === video.snippet.categoryId)
+              ? video.snippet.categoryId
+              : null
             return {
               id: video.id,
               title: video.snippet.title || null,
@@ -173,7 +176,7 @@ const locale = 'FR'
               has_caption: video.contentDetails.caption === 'true' ? true : false,
               is_licensed: video.contentDetails.licensedContent || false,
               language_id: languageId,
-              video_category_id: video.snippet.categoryId || null,
+              video_category_id: videoCategoryId,
               channel_id: video.snippet.channelId || null
             }
           }))
