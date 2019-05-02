@@ -71,7 +71,7 @@ const locale = 'FR'
     // Import regions
 
     // TODO : uncomment
-    const regionCodes = [ 'FR' , 'HK' ]// , 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
+    const regionCodes = [ 'FR' , 'HK' , 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
 
     let videoCategoryHasRegion = []
 
@@ -218,16 +218,17 @@ const locale = 'FR'
     for (let i = 0; i < filteredChannelIds.length; i += 50) {
       const lengthToTake = i + 50 > filteredChannelIds.length ? filteredChannelIds.length : i + 50
       const response = await fetchYouTubeData('channels', {
-        part: 'snippet',
+        part: 'snippet,statistics',
         hl: locale,
         id: filteredChannelIds.slice(i, lengthToTake).join(','),
-        fields: 'items(id,snippet(description,publishedAt,title))'
+        fields: 'items(id,snippet(description,publishedAt,title),statistics/subscriberCount)'
       })
       channels.push(...response.map(item => ({
         id: item.id,
         title: item.snippet.title,
         description: item.snippet.description,
-        published_at: item.snippet.publishedAt
+        published_at: item.snippet.publishedAt,
+        subscriber_count: item.statistics.subscriberCount
       })))
     }
 
