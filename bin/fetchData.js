@@ -71,7 +71,7 @@ const locale = 'FR'
     // Import regions
 
     // TODO : uncomment
-    const regionCodes = [ 'FR' , 'HK' , 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
+    const regionCodes = [ 'FR', 'HK', 'US', 'FI', 'IN', 'JP', 'KR', 'ES', 'IT', 'CH', 'BR', 'CA', 'DE', 'BE', 'IL', 'JM', 'MA', 'NZ', 'NG', 'RU', 'PT', 'TW', 'CO', 'NL', 'CH', 'NO', 'RS', 'DK', 'KE', 'ZA', 'SN', 'TR' ]
 
     let videoCategoryHasRegion = []
 
@@ -128,6 +128,7 @@ const locale = 'FR'
     // Import videos
 
     let videos = []
+    let videoIsPopularInRegion = []
     let tags = []
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i]
@@ -162,6 +163,10 @@ const locale = 'FR'
             const videoCategoryId = videoCategories.find(videoCategory => videoCategory.id === video.snippet.categoryId)
               ? video.snippet.categoryId
               : null
+            videoIsPopularInRegion.push({
+              video_id: video.id,
+              region_id: region.id
+            })
             return {
               id: video.id,
               title: video.snippet.title || null,
@@ -234,6 +239,11 @@ const locale = 'FR'
 
     await queryMySQL('insert', 'channel', channels)
     await queryMySQL('insert', 'video', filteredVideos)
+
+    // Import video_is_popular_in_region
+
+    console.log(videoIsPopularInRegion)
+    await queryMySQL('insert', 'video_is_popular_in_region', videoIsPopularInRegion)
 
     // Import video_has_tag
 
