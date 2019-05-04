@@ -20,6 +20,7 @@ import { Comment } from './comment.entity';
 import { Thumbnail } from './thumbnail.entity';
 import { Playlist } from './playlist.entity';
 import { Tag } from './tag.entity';
+import { Region } from './region.entity';
 
 @Entity('video', { schema: 'data_tube' })
 @Index('fk_video_language1_idx', ['language'])
@@ -67,22 +68,22 @@ export class Video {
   viewCount: number;
 
   @Column('int', {
-    nullable: false,
+    nullable: true,
     name: 'like_count',
   })
-  likeCount: number;
+  likeCount: number | null;
 
   @Column('int', {
-    nullable: false,
+    nullable: true,
     name: 'dislike_count',
   })
-  dislikeCount: number;
+  dislikeCount: number | null;
 
   @Column('int', {
-    nullable: false,
+    nullable: true,
     name: 'comment_count',
   })
-  commentCount: number;
+  commentCount: number | null;
 
   @Column('varchar', {
     nullable: false,
@@ -106,7 +107,6 @@ export class Video {
   isLicensed: boolean;
 
   @ManyToOne(type => Language, language => language.videos, {
-    nullable: false,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
@@ -114,7 +114,6 @@ export class Video {
   language: Language | null;
 
   @ManyToOne(type => VideoCategory, video_category => video_category.videos, {
-    nullable: false,
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
@@ -147,4 +146,8 @@ export class Video {
   @ManyToMany(type => Tag, tag => tag.videos, { nullable: false })
   @JoinTable({ name: 'video_has_tag' })
   tags: Tag[];
+
+  @ManyToMany(type => Region, region => region.videos, { nullable: false })
+  @JoinTable({ name: 'video_is_popular_in_region' })
+  regions: Region[];
 }

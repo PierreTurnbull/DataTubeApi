@@ -27,7 +27,7 @@ export class Language {
 
   @Column('varchar', {
     nullable: false,
-    length: 2,
+    length: 16,
     name: 'code',
   })
   code: string;

@@ -17,8 +17,9 @@ import { Video } from './video.entity';
 
 @Entity('tag', { schema: 'data_tube' })
 export class Tag {
-  @PrimaryGeneratedColumn({
-    type: 'int',
+  @Column('int', {
+    nullable: false,
+    primary: true,
     name: 'id',
   })
   id: number;

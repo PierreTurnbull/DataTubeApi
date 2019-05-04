@@ -14,6 +14,7 @@ import {
   RelationId,
 } from 'typeorm';
 import { VideoCategory } from './video_category.entity';
+import { Video } from './video.entity';
 
 @Entity('region', { schema: 'data_tube' })
 export class Region {
@@ -34,4 +35,7 @@ export class Region {
 
   @ManyToMany(type => VideoCategory, video_category => video_category.regions)
   videoCategories: VideoCategory[];
+
+  @ManyToMany(type => Video, video => video.regions)
+  videos: Video[];
 }

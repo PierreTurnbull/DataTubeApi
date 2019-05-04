@@ -29,14 +29,14 @@ export class Channel {
 
   @Column('varchar', {
     nullable: false,
-    length: 45,
+    length: 1000,
     name: 'title',
   })
   title: string;
 
   @Column('varchar', {
     nullable: true,
-    length: 45,
+    length: 1000,
     name: 'description',
   })
   description: string | null;
@@ -47,6 +47,12 @@ export class Channel {
     name: 'published_at',
   })
   publishedAt: string;
+
+  @Column('int', {
+    nullable: true,
+    name: 'subscriber_count',
+  })
+  subscriberCount: number | null;
 
   @OneToMany(type => Playlist, playlist => playlist.channel, {
     onDelete: 'NO ACTION',
