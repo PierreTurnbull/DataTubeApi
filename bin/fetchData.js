@@ -96,8 +96,8 @@ const locale = 'FR'
       })
       videoCategoriesByRegion.forEach(regionCategory => {
         videoCategoryHasRegion.push({
-          region_id: region.id,
-          video_category_id: regionCategory.id
+          regionId: region.id,
+          videoCategoryId: regionCategory.id
         })
         if (!videoCategories.find(category => category.id === regionCategory.id)) {
           videoCategories.push({
@@ -108,11 +108,11 @@ const locale = 'FR'
       })
     }
     
-    await queryMySQL('insert', 'video_category', videoCategories)
+    await queryMySQL('insert', 'videoCategory', videoCategories)
 
-    // Import video_category_has_region
+    // Import videoCategoryHasRegion
 
-    await queryMySQL('insert', 'video_category_has_region', videoCategoryHasRegion)
+    await queryMySQL('insert', 'videoCategoryHasRegion', videoCategoryHasRegion)
 
     // Import languages
 
@@ -164,25 +164,25 @@ const locale = 'FR'
               ? video.snippet.categoryId
               : null
             videoIsPopularInRegion.push({
-              video_id: video.id,
-              region_id: region.id
+              videoId: video.id,
+              regionId: region.id
             })
             return {
               id: video.id,
               title: video.snippet.title || null,
               description: video.snippet.title || null,
-              published_at: (video.snippet.publishedAt && new Date(video.snippet.publishedAt).toJSON().slice(0, 19).replace('T', ' ')) || null,
+              publishedAt: (video.snippet.publishedAt && new Date(video.snippet.publishedAt).toJSON().slice(0, 19).replace('T', ' ')) || null,
               duration: formattedDuration,
-              view_count: video.statistics.viewCount || null,
-              like_count: video.statistics.likeCount || null,
-              dislike_count: video.statistics.dislikeCount || null,
-              comment_count: video.statistics.commentCount || null,
+              viewCount: video.statistics.viewCount || null,
+              likeCount: video.statistics.likeCount || null,
+              dislikeCount: video.statistics.dislikeCount || null,
+              commentCount: video.statistics.commentCount || null,
               definition: video.contentDetails.definition || null,
-              has_caption: video.contentDetails.caption === 'true' ? true : false,
-              is_licensed: video.contentDetails.licensedContent || false,
-              language_id: languageId,
-              video_category_id: videoCategoryId,
-              channel_id: video.snippet.channelId || null
+              hasCaption: video.contentDetails.caption === 'true' ? true : false,
+              isLicensed: video.contentDetails.licensedContent || false,
+              languageId: languageId,
+              videoCategoryId: videoCategoryId,
+              channelId: video.snippet.channelId || null
             }
           }))
           videosResponse.items.forEach(video => {
@@ -216,7 +216,7 @@ const locale = 'FR'
 
     // Import channels
 
-    const channelIds = filteredVideos.map(video => video.channel_id)
+    const channelIds = filteredVideos.map(video => video.channelId)
     const filteredChannelIds = channelIds.filter((channelId, index) => channelIds.indexOf(channelId) >= index)
 
     let channels = []
@@ -232,25 +232,24 @@ const locale = 'FR'
         id: item.id,
         title: item.snippet.title,
         description: item.snippet.description,
-        published_at: item.snippet.publishedAt,
-        subscriber_count: item.statistics.subscriberCount
+        publishedAt: item.snippet.publishedAt,
+        subscriberCount: item.statistics.subscriberCount
       })))
     }
 
     await queryMySQL('insert', 'channel', channels)
     await queryMySQL('insert', 'video', filteredVideos)
 
-    // Import video_is_popular_in_region
+    // Import videoIsPopularInRegion
 
-    console.log(videoIsPopularInRegion)
-    await queryMySQL('insert', 'video_is_popular_in_region', videoIsPopularInRegion)
+    await queryMySQL('insert', 'videoIsPopularInRegion', videoIsPopularInRegion)
 
-    // Import video_has_tag
+    // Import videoHasTag
 
-    await queryMySQL('insert', 'video_has_tag', tags.map(tag => 
+    await queryMySQL('insert', 'videoHasTag', tags.map(tag => 
       tag.taggedVideoIds.map(taggedVideoId => ({
-        video_id: taggedVideoId,
-        tag_id: tag.id
+        videoId: taggedVideoId,
+        tagId: tag.id
       }))
     ).flat())
   } catch (error) {
