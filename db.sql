@@ -309,6 +309,31 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4;
 
 
+-- -----------------------------------------------------
+-- Table `data_tube`.`video_is_popular_in_region`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `data_tube`.`video_is_popular_in_region` ;
+
+CREATE TABLE IF NOT EXISTS `data_tube`.`video_is_popular_in_region` (
+  `video_id` VARCHAR(64) NOT NULL,
+  `region_id` VARCHAR(2) NOT NULL,
+  PRIMARY KEY (`video_id`, `region_id`),
+  INDEX `fk_video_has_region_region1_idx` (`region_id` ASC),
+  INDEX `fk_video_has_region_video1_idx` (`video_id` ASC),
+  CONSTRAINT `fk_video_has_region_video1`
+    FOREIGN KEY (`video_id`)
+    REFERENCES `data_tube`.`video` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_video_has_region_region1`
+    FOREIGN KEY (`region_id`)
+    REFERENCES `data_tube`.`region` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
