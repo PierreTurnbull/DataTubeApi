@@ -132,7 +132,9 @@ const locale = 'FR'
     let tags = []
     for (let i = 0; i < regions.length; i++) {
       const region = regions[i]
-      for (let j = 0; j < 1; j++) {
+      console.log(`Region: ${i + 1} / ${regions.length}`)
+      for (let j = 0; j < videoCategories.length; j++) {
+        console.log(`Category: ${j + 1} / ${videoCategories.length}`)
         let nextPageToken = null
         const videoCategory = videoCategories[j]
         do {
@@ -147,6 +149,7 @@ const locale = 'FR'
             pageToken: nextPageToken || '',
             fields: 'items(contentDetails(caption,definition,duration,licensedContent),id,snippet(categoryId,channelId,defaultAudioLanguage,defaultLanguage,description,publishedAt,tags,thumbnails,title),statistics(commentCount,dislikeCount,likeCount,viewCount)),nextPageToken'
           }, true)
+          if (!videosResponse.items) { break }
           videos.push(...videosResponse.items.map(video => {
             const duration = video.contentDetails.duration || null
             let formattedDuration = null
