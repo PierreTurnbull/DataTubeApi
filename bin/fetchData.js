@@ -40,7 +40,7 @@ const locale = 'FR'
 
       await fetch(url.get())
         .then(response => response.json())
-        .then(rawData => { formattedData = getMetadata ? rawData : rawData.items })
+        .then(rawData => formattedData = getMetadata ? rawData : rawData.items)
         .catch(error => {
           sendCustomError(error.message, `Failed to fetch data for model '${model}'.`)
         })
@@ -138,7 +138,6 @@ const locale = 'FR'
         let nextPageToken = null
         const videoCategory = videoCategories[j]
         do {
-          // live example: https://developers.google.com/apis-explorer/#s/youtube/v3/youtube.videos.list?part=snippet%252Cid&chart=mostPopular&hl=FR&maxResults=10&regionCode=FR&videoCategoryId=10&fields=items(contentDetails(caption%252Cdefinition%252Cduration%252ClicensedContent)%252Cid%252Csnippet(categoryId%252CchannelId%252CdefaultAudioLanguage%252CdefaultLanguage%252Cdescription%252CpublishedAt%252Ctags%252Cthumbnails%252Ctitle)%252Cstatistics(commentCount%252CdislikeCount%252ClikeCount%252CviewCount))%252CnextPageToken&_h=38&
           const videosResponse = await fetchYouTubeData('videos', {
             part: 'contentDetails,snippet,statistics',
             chart: 'mostPopular',
@@ -150,68 +149,68 @@ const locale = 'FR'
             fields: 'items(contentDetails(caption,definition,duration,licensedContent),id,snippet(categoryId,channelId,defaultAudioLanguage,defaultLanguage,description,publishedAt,tags,thumbnails,title),statistics(commentCount,dislikeCount,likeCount,viewCount)),nextPageToken'
           }, true)
           if (!videosResponse.items) { break }
-          videos.push(...videosResponse.items.map(video => {
-            const duration = video.contentDetails.duration || null
-            let formattedDuration = null
-            if (duration) {
-              formattedDuration = duration
-                .match(/[\d]{1,}/g)
-                .reduce((a,b) => Number(a * 60) + Number(b))
-            }
-            const videoLanguageId = video.snippet.defaultLanguage || video.snippet.defaultAudioLanguage || null
-            const correspondingLanguage = languages.find(language => language.id === videoLanguageId)
-            const languageId = videoLanguageId && correspondingLanguage
-              ? videoLanguageId
-              : null
-            const videoCategoryId = videoCategories.find(videoCategory => videoCategory.id === video.snippet.categoryId)
-              ? video.snippet.categoryId
-              : null
-            videoIsPopularInRegion.push({
-              videoId: video.id,
-              regionId: region.id
-            })
-            return {
-              id: video.id,
-              title: video.snippet.title || null,
-              description: video.snippet.title || null,
-              publishedAt: (video.snippet.publishedAt && new Date(video.snippet.publishedAt).toJSON().slice(0, 19).replace('T', ' ')) || null,
-              duration: formattedDuration,
-              viewCount: video.statistics.viewCount || null,
-              likeCount: video.statistics.likeCount || null,
-              dislikeCount: video.statistics.dislikeCount || null,
-              commentCount: video.statistics.commentCount || null,
-              definition: video.contentDetails.definition || null,
-              hasCaption: video.contentDetails.caption === 'true' ? true : false,
-              isLicensed: video.contentDetails.licensedContent || false,
-              languageId: languageId,
-              videoCategoryId: videoCategoryId,
-              channelId: video.snippet.channelId || null
-            }
-          }))
-          videosResponse.items.forEach(video => {
-            if (!video.snippet.tags) { return }
-            video.snippet.tags
-              .map(tag => tag.toLowerCase())
-              .forEach(videoTag => {
-                const existingTag = tags.find(tag => {
-                  return tag.name === videoTag
-                })
-                if (existingTag) {
-                  existingTag.taggedVideoIds.push(video.id)
-                } else {
-                  tags.push({
-                    id: tags.length + 1,
-                    name: videoTag,
-                    taggedVideoIds: [video.id]
-                  })
-                }
+          videos.push(...videosResponse.items
+            .map(video => {
+              const duration = video.contentDetails.duration || null
+              let formattedDuration = null
+              if (duration) {
+                formattedDuration = duration
+                  .match(/[\d]{1,}/g)
+                  .reduce((a,b) => Number(a * 60) + Number(b))
+              }
+              const videoLanguageId = video.snippet.defaultLanguage || video.snippet.defaultAudioLanguage || null
+              const correspondingLanguage = languages.find(language => language.id === videoLanguageId)
+              const languageId = videoLanguageId && correspondingLanguage
+                ? videoLanguageId
+                : null
+              const videoCategoryId = videoCategories.find(videoCategory => videoCategory.id === video.snippet.categoryId)
+                ? video.snippet.categoryId
+                : null
+              if (videos.find(savedVideo => savedVideo.id === video.id)) { return }
+              videoIsPopularInRegion.push({
+                videoId: video.id,
+                regionId: region.id
               })
-          })
+              if (video.snippet.tags) {
+                video.snippet.tags
+                  .map(tag => tag.toLowerCase())
+                  .forEach(videoTag => {
+                    const existingTag = tags.find(tag => {
+                      return tag.name === videoTag
+                    })
+                    if (existingTag) {
+                      existingTag.taggedVideoIds.push(video.id)
+                    } else {
+                      tags.push({
+                        id: tags.length + 1,
+                        name: videoTag,
+                        taggedVideoIds: [video.id]
+                      })
+                    }
+                  })
+              }
+              return {
+                id: video.id,
+                title: video.snippet.title || null,
+                description: video.snippet.title || null,
+                publishedAt: (video.snippet.publishedAt && new Date(video.snippet.publishedAt).toJSON().slice(0, 19).replace('T', ' ')) || null,
+                duration: formattedDuration,
+                viewCount: video.statistics.viewCount || null,
+                likeCount: video.statistics.likeCount || null,
+                dislikeCount: video.statistics.dislikeCount || null,
+                commentCount: video.statistics.commentCount || null,
+                definition: video.contentDetails.definition || null,
+                hasCaption: video.contentDetails.caption === 'true' ? true : false,
+                isLicensed: video.contentDetails.licensedContent || false,
+                languageId: languageId,
+                videoCategoryId: videoCategoryId,
+                channelId: video.snippet.channelId || null
+              }
+            }).filter(a => a !== undefined))
           nextPageToken = videosResponse.nextPageToken
         } while (nextPageToken)
       }
     }
-    const filteredVideos = videos.filter((video, index) => videos.map(video => video.id).indexOf(video.id) >= index)
 
     // Import tags
 
@@ -219,7 +218,7 @@ const locale = 'FR'
 
     // Import channels
 
-    const channelIds = filteredVideos.map(video => video.channelId)
+    const channelIds = videos.map(video => video.channelId)
     const filteredChannelIds = channelIds.filter((channelId, index) => channelIds.indexOf(channelId) >= index)
 
     let channels = []
@@ -241,7 +240,7 @@ const locale = 'FR'
     }
 
     await queryMySQL('insert', 'channel', channels)
-    await queryMySQL('insert', 'video', filteredVideos)
+    await queryMySQL('insert', 'video', videos)
 
     // Import videoIsPopularInRegion
 
