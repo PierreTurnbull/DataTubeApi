@@ -36,7 +36,7 @@ export class Channel {
 
   @Column('varchar', {
     nullable: true,
-    length: 1000,
+    length: 10000,
     name: 'description',
   })
   description: string | null;
@@ -44,13 +44,13 @@ export class Channel {
   @Column('varchar', {
     nullable: false,
     length: 45,
-    name: 'published_at',
+    name: 'publishedAt',
   })
   publishedAt: string;
 
   @Column('int', {
     nullable: true,
-    name: 'subscriber_count',
+    name: 'subscriberCount',
   })
   subscriberCount: number | null;
 

@@ -18,9 +18,9 @@ import { Playlist } from './playlist.entity';
 import { Video } from './video.entity';
 
 @Entity('thumbnail', { schema: 'data_tube' })
-@Index('fk_thumbnail_channel1_idx', ['channel'])
-@Index('fk_thumbnail_playlist1_idx', ['playlist'])
-@Index('fk_thumbnail_video1_idx', ['video'])
+@Index('fkThumbnailChannel1Idx', ['channel'])
+@Index('fkThumbnailPlaylist1Idx', ['playlist'])
+@Index('fkThumbnailVideo1Idx', ['video'])
 export class Thumbnail {
   @PrimaryGeneratedColumn({
     type: 'int',
@@ -58,20 +58,20 @@ export class Thumbnail {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'channel_id' })
+  @JoinColumn({ name: 'channelId' })
   channel: Channel | null;
 
   @ManyToOne(type => Playlist, playlist => playlist.thumbnails, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'playlist_id' })
+  @JoinColumn({ name: 'playlistId' })
   playlist: Playlist | null;
 
   @ManyToOne(type => Video, video => video.thumbnails, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'video_id' })
+  @JoinColumn({ name: 'videoId' })
   video: Video | null;
 }

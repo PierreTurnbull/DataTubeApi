@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from '../controllers/app.controller';
 import { RegionModule } from './region.module';
 import { RessourcesModule } from './ressources.module';
-import { VideoCategoryModule } from './video_category.module';
+import { VideoCategoryModule } from './videoCategory.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({

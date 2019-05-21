@@ -14,7 +14,7 @@ import {
   RelationId,
 } from 'typeorm';
 import { Language } from './language.entity';
-import { VideoCategory } from './video_category.entity';
+import { VideoCategory } from './videoCategory.entity';
 import { Channel } from './channel.entity';
 import { Comment } from './comment.entity';
 import { Thumbnail } from './thumbnail.entity';
@@ -23,9 +23,9 @@ import { Tag } from './tag.entity';
 import { Region } from './region.entity';
 
 @Entity('video', { schema: 'data_tube' })
-@Index('fk_video_language1_idx', ['language'])
-@Index('fk_video_video_category1_idx', ['videoCategory'])
-@Index('fk_video_channel1_idx', ['channel'])
+@Index('fkVideoLanguage1Idx', ['language'])
+@Index('fkVideoVideoCategory1Idx', ['videoCategory'])
+@Index('fkVideoChannel1Idx', ['channel'])
 export class Video {
   @Column('varchar', {
     nullable: false,
@@ -51,7 +51,7 @@ export class Video {
 
   @Column('datetime', {
     nullable: false,
-    name: 'published_at',
+    name: 'publishedAt',
   })
   publishedAt: Date;
 
@@ -62,26 +62,26 @@ export class Video {
   duration: number;
 
   @Column('int', {
-    nullable: false,
-    name: 'view_count',
+    nullable: true,
+    name: 'viewCount',
   })
-  viewCount: number;
+  viewCount: number | null;
 
   @Column('int', {
     nullable: true,
-    name: 'like_count',
+    name: 'likeCount',
   })
   likeCount: number | null;
 
   @Column('int', {
     nullable: true,
-    name: 'dislike_count',
+    name: 'dislikeCount',
   })
   dislikeCount: number | null;
 
   @Column('int', {
     nullable: true,
-    name: 'comment_count',
+    name: 'commentCount',
   })
   commentCount: number | null;
 
@@ -95,14 +95,14 @@ export class Video {
   @Column('tinyint', {
     nullable: false,
     width: 1,
-    name: 'has_caption',
+    name: 'hasCaption',
   })
   hasCaption: boolean;
 
   @Column('tinyint', {
     nullable: false,
     width: 1,
-    name: 'is_licensed',
+    name: 'isLicensed',
   })
   isLicensed: boolean;
 
@@ -110,14 +110,14 @@ export class Video {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'language_id' })
+  @JoinColumn({ name: 'languageId' })
   language: Language | null;
 
-  @ManyToOne(type => VideoCategory, video_category => video_category.videos, {
+  @ManyToOne(type => VideoCategory, videoCategory => videoCategory.videos, {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'video_category_id' })
+  @JoinColumn({ name: 'videoCategoryId' })
   videoCategory: VideoCategory | null;
 
   @ManyToOne(type => Channel, channel => channel.videos, {
@@ -125,7 +125,7 @@ export class Video {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'channel_id' })
+  @JoinColumn({ name: 'channelId' })
   channel: Channel | null;
 
   @OneToMany(type => Comment, comment => comment.video, {
@@ -144,10 +144,10 @@ export class Video {
   playlists: Playlist[];
 
   @ManyToMany(type => Tag, tag => tag.videos, { nullable: false })
-  @JoinTable({ name: 'video_has_tag' })
+  @JoinTable({ name: 'videoHasTag' })
   tags: Tag[];
 
   @ManyToMany(type => Region, region => region.videos, { nullable: false })
-  @JoinTable({ name: 'video_is_popular_in_region' })
+  @JoinTable({ name: 'videoIsPopularInRegion' })
   regions: Region[];
 }

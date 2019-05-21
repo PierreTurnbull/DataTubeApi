@@ -13,7 +13,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
 } from 'typeorm';
-import { VideoCategory } from './video_category.entity';
+import { VideoCategory } from './videoCategory.entity';
 import { Video } from './video.entity';
 
 @Entity('region', { schema: 'data_tube' })
@@ -33,7 +33,7 @@ export class Region {
   })
   name: string;
 
-  @ManyToMany(type => VideoCategory, video_category => video_category.regions)
+  @ManyToMany(type => VideoCategory, videoCategory => videoCategory.regions)
   videoCategories: VideoCategory[];
 
   @ManyToMany(type => Video, video => video.regions)

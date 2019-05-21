@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { VideoCategory as VideoCategoryEntity } from '../entities/video_category.entity';
+import { VideoCategory as VideoCategoryEntity } from '../entities/videoCategory.entity';
 
 @Injectable()
 export class VideoCategoryService {

@@ -6,7 +6,7 @@ export class RessourcesController {
   constructor(private readonly ressourcesService: RessourcesService) {}
 
   @Get('/countries/:country/categories/:category')
-  async index(@Param() params: Object) {
+  async index(@Param() params) {
     return await this.ressourcesService.getRessoucesByCountriesAndCategories(
       params,
     );

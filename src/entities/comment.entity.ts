@@ -16,7 +16,7 @@ import {
 import { Video } from './video.entity';
 
 @Entity('comment', { schema: 'data_tube' })
-@Index('fk_comment_video1_idx', ['video'])
+@Index('fkCommentVideo1Idx', ['video'])
 export class Comment {
   @Column('varchar', {
     nullable: false,
@@ -28,7 +28,7 @@ export class Comment {
 
   @Column('datetime', {
     nullable: false,
-    name: 'published_at',
+    name: 'publishedAt',
   })
   publishedAt: Date;
 
@@ -37,6 +37,6 @@ export class Comment {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'video_id' })
+  @JoinColumn({ name: 'videoId' })
   video: Video | null;
 }

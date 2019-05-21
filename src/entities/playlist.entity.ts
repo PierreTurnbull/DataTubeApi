@@ -18,7 +18,7 @@ import { Thumbnail } from './thumbnail.entity';
 import { Video } from './video.entity';
 
 @Entity('playlist', { schema: 'data_tube' })
-@Index('fk_playlist_channel1_idx', ['channel'])
+@Index('fkPlaylistChannel1Idx', ['channel'])
 export class Playlist {
   @Column('varchar', {
     nullable: false,
@@ -30,7 +30,7 @@ export class Playlist {
 
   @Column('datetime', {
     nullable: false,
-    name: 'published_at',
+    name: 'publishedAt',
   })
   publishedAt: Date;
 
@@ -53,7 +53,7 @@ export class Playlist {
     onDelete: 'NO ACTION',
     onUpdate: 'NO ACTION',
   })
-  @JoinColumn({ name: 'channel_id' })
+  @JoinColumn({ name: 'channelId' })
   channel: Channel | null;
 
   @OneToMany(type => Thumbnail, thumbnail => thumbnail.playlist, {
@@ -63,6 +63,6 @@ export class Playlist {
   thumbnails: Thumbnail[];
 
   @ManyToMany(type => Video, video => video.playlists, { nullable: false })
-  @JoinTable({ name: 'playlist_has_video' })
+  @JoinTable({ name: 'playlistHasVideo' })
   videos: Video[];
 }

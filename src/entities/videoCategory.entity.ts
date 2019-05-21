@@ -16,7 +16,7 @@ import {
 import { Video } from './video.entity';
 import { Region } from './region.entity';
 
-@Entity('video_category', { schema: 'data_tube' })
+@Entity('videoCategory', { schema: 'data_tube' })
 export class VideoCategory {
   @Column('int', {
     nullable: false,
@@ -41,6 +41,6 @@ export class VideoCategory {
   @ManyToMany(type => Region, region => region.videoCategories, {
     nullable: false,
   })
-  @JoinTable({ name: 'video_category_has_region' })
+  @JoinTable({ name: 'videoCategoryHasRegion' })
   regions: Region[];
 }
