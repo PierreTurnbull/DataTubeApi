@@ -20,17 +20,28 @@ export class RessourcesService {
   async getRessoucesByCountriesAndCategories(params: {
     country: string;
     category: number;
+    range: string;
   }) {
+    const range = params.range.split('-');
+
     const videos = await this.videoRepository
       .createQueryBuilder('video')
       .leftJoinAndSelect('video.regions', 'region')
       .leftJoinAndSelect('video.videoCategory', 'videoCategory')
+      .leftJoinAndSelect('video.channel', 'channel')
       .where('videoCategory.id = :category', {
         category: params.category,
       })
       .andWhere('region.id = :country', {
         country: params.country,
       })
+      .andWhere(
+        'channel.subscriberCount >= :range1 AND channel.subscriberCount < :range2',
+        {
+          range1: range[0],
+          range2: range[1],
+        },
+      )
       .getMany();
 
     const bestTags = await this.tagRepository
@@ -54,7 +65,7 @@ export class RessourcesService {
       .createQueryBuilder('channel')
       .addSelect(
         'CASE WHEN channel.subscriberCount >= 0 AND channel.subscriberCount < 10000 THEN "0 - 10 000" WHEN channel.subscriberCount >= 10000 AND channel.subscriberCount < 100000 THEN "10 000 - 100 000" WHEN channel.subscriberCount >= 100000 AND channel.subscriberCount < 500000 THEN "100 000 - 500 000" WHEN channel.subscriberCount >= 500000 AND channel.subscriberCount < 1000000 THEN "500 000 - 1 000 000" WHEN channel.subscriberCount >= 1000000 AND channel.subscriberCount < 10000000 THEN "1 000 000 - 10 000 000" WHEN channel.subscriberCount >= 10000000 AND channel.subscriberCount < 100000000 THEN "10 000 000 - 100 000 000" ELSE "unknown" END',
-        'range',
+        'label',
       )
       .innerJoin('channel.videos', 'videos')
       .innerJoin('videos.regions', 'region')
@@ -65,11 +76,17 @@ export class RessourcesService {
 
     const subscriberRanges = await this.connection
       .createQueryBuilder()
-      .addSelect('total.range', 'range')
+      .addSelect('total.label', 'label')
       .addSelect('count(*)', 'nbChannelInRange')
       .from('(' + subquery.getQuery() + ')', 'total')
-      .groupBy('total.range')
+      .groupBy('total.label')
       .getRawMany();
+
+    subscriberRanges.map(item => {
+      item.value = item.label.split(' ').join('');
+
+      return item;
+    });
 
     // Time
     const minimumVideoTime = getMinValue(videos, 'duration');
