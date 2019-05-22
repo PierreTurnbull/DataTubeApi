@@ -46,8 +46,17 @@ export class RessourcesService {
       .limit(3)
       .getMany();
 
+    // Time
+    const minimumVideoTime = getMinValue(videos, 'duration');
+    const maximumVideoTime = getMaxValue(videos, 'duration');
     const averageTime = Math.round(calculAverages(videos, 'duration'));
+
+    // Views
+    const minimumVideoView = getMinValue(videos, 'viewCount');
+    const maximumVideoView = getMaxValue(videos, 'viewCount');
     const averageViewCount = Math.round(calculAverages(videos, 'viewCount'));
+
+    // Likes
     const likes = videos.reduce((current, next) => current + next.likeCount, 0);
     const dislikes = videos.reduce(
       (current, next) => current + next.dislikeCount,
@@ -57,6 +66,12 @@ export class RessourcesService {
     const dislikePourcentage = Math.round(
       (dislikes / (likes + dislikes)) * 100,
     );
+    const minimumVideoDislike = getMinValue(videos, 'dislikeCount');
+    const maximumVideoDislike = getMaxValue(videos, 'dislikeCount');
+    const minimumVideoLike = getMinValue(videos, 'likeCount');
+    const maximumVideoLike = getMaxValue(videos, 'likeCount');
+
+    // Days & Hours
     const days = [
       'dimanche',
       'lundi',
@@ -80,16 +95,26 @@ export class RessourcesService {
         value: numberOfPublication,
       };
     });
-    const bestNumberOfPublication = getBestValue(numberOfPublicationByDay);
+    const bestNumberOfPublication = getBestValue(
+      numberOfPublicationByDay,
+      'value',
+    );
     const timeOfPublication = getTimeOfPublication(videos);
-    const bestTimeOfPublication = getBestValue(timeOfPublication);
+    const bestTimeOfPublication = getBestValue(timeOfPublication, 'value');
 
     return {
-      videos,
+      minimumVideoTime,
+      maximumVideoTime,
       averageTime,
+      minimumVideoView,
+      maximumVideoView,
       averageViewCount,
       likePourcentage,
       dislikePourcentage,
+      minimumVideoDislike,
+      maximumVideoDislike,
+      minimumVideoLike,
+      maximumVideoLike,
       numberOfPublicationByDay,
       bestNumberOfPublication,
       timeOfPublication,
@@ -158,10 +183,16 @@ function getTimeOfPublication(videos: any[]) {
   return timeOfPublicationByRange;
 }
 
-function getBestValue(array: { label: string; value: number }[]) {
-  const max = Math.max(...array.map((item: { value: number }) => item.value));
+function getMaxValue(array: {}[], key) {
+  return Math.max(...array.map(item => item[key]));
+}
 
-  return array.find((item: { value: number }) => item.value === max);
+function getMinValue(array: {}[], key) {
+  return Math.min(...array.map(item => item[key]));
+}
+
+function getBestValue(array: {}[], key) {
+  return array.find(item => item[key] === getMaxValue(array, key));
 }
 
 function filterVideoByTimeRange(
