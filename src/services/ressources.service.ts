@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { Repository, Connection } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Video as VideoEntity } from '../entities/video.entity';
 import { Tag as TagEntity } from '../entities/tag.entity';
+import { Channel as ChannelEntity, Channel } from '../entities/channel.entity';
 
 @Injectable()
 export class RessourcesService {
@@ -11,6 +12,9 @@ export class RessourcesService {
     private readonly videoRepository: Repository<VideoEntity>,
     @InjectRepository(TagEntity)
     private readonly tagRepository: Repository<TagEntity>,
+    @InjectRepository(ChannelEntity)
+    private readonly channelRepository: Repository<ChannelEntity>,
+    private readonly connection: Connection,
   ) {}
 
   async getRessoucesByCountriesAndCategories(params: {
@@ -45,6 +49,27 @@ export class RessourcesService {
       .orderBy('nbTag', 'DESC')
       .limit(3)
       .getMany();
+
+    const subquery = await this.channelRepository
+      .createQueryBuilder('channel')
+      .addSelect(
+        'CASE WHEN channel.subscriberCount >= 0 AND channel.subscriberCount < 10000 THEN "0 - 10 000" WHEN channel.subscriberCount >= 10000 AND channel.subscriberCount < 100000 THEN "10 000 - 100 000" WHEN channel.subscriberCount >= 100000 AND channel.subscriberCount < 500000 THEN "100 000 - 500 000" WHEN channel.subscriberCount >= 500000 AND channel.subscriberCount < 1000000 THEN "500 000 - 1 000 000" WHEN channel.subscriberCount >= 1000000 AND channel.subscriberCount < 10000000 THEN "1 000 000 - 10 000 000" WHEN channel.subscriberCount >= 10000000 AND channel.subscriberCount < 100000000 THEN "10 000 000 - 100 000 000" ELSE "unknown" END',
+        'range',
+      )
+      .innerJoin('channel.videos', 'videos')
+      .innerJoin('videos.regions', 'region')
+      .innerJoin('videos.videoCategory', 'videoCategory')
+      .where('videoCategory.id = ' + params.category)
+      .andWhere('region.id = "' + params.country + '"')
+      .groupBy('channel.id');
+
+    const subscriberRanges = await this.connection
+      .createQueryBuilder()
+      .addSelect('total.range', 'range')
+      .addSelect('count(*)', 'nbChannelInRange')
+      .from('(' + subquery.getQuery() + ')', 'total')
+      .groupBy('total.range')
+      .getRawMany();
 
     // Time
     const minimumVideoTime = getMinValue(videos, 'duration');
@@ -120,6 +145,7 @@ export class RessourcesService {
       timeOfPublication,
       bestTimeOfPublication,
       bestTags,
+      subscriberRanges,
     };
   }
 }
