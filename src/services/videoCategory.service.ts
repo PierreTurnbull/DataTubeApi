@@ -11,6 +11,11 @@ export class VideoCategoryService {
   ) {}
 
   async findAll() {
-    return await this.videoCategoryRepository.find();
+    const categories = await this.videoCategoryRepository.find();
+
+    return categories.map(category => ({
+      label: category.name,
+      value: category.id,
+    }));
   }
 }

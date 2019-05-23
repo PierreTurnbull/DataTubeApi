@@ -11,6 +11,11 @@ export class RegionService {
   ) {}
 
   async findAll() {
-    return await this.regionsRepository.find();
+    const regions = await this.regionsRepository.find();
+
+    return regions.map(region => ({
+      label: region.name,
+      value: region.id,
+    }));
   }
 }
