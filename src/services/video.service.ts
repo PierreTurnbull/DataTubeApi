@@ -22,6 +22,9 @@ export class VideoService {
     if (getVideosQuery.region !== undefined) {
       videos = videos.andWhere('regions.name = :region', { region: getVideosQuery.region })
     }
-    return (await videos.getManyAndCount())[1];
+    if (getVideosQuery.filters !== undefined) {
+      videos = videos.select(getVideosQuery.filters.map(filter => 'video.' + filter))
+    }
+    return await videos.getMany();
   }
 }
