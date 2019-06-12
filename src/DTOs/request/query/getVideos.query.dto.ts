@@ -1,5 +1,5 @@
 export class GetVideosQuery {
-  readonly region?: string;
-  readonly videoCategory?: string;
+  readonly regionId?: string;
+  readonly videoCategoryId?: number;
   readonly filters?: any;
 }

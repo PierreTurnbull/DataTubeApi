@@ -16,11 +16,11 @@ export class VideoService {
       .createQueryBuilder('video')
       .innerJoinAndSelect('video.videoCategory', 'videoCategory')
       .innerJoinAndSelect('video.regions', 'regions')
-    if (getVideosQuery.videoCategory !== undefined) {
-      videos = videos.where('videoCategory.name = :videoCategory', { videoCategory: getVideosQuery.videoCategory })
+    if (getVideosQuery.videoCategoryId !== undefined) {
+      videos = videos.andWhere('videoCategory.id = :videoCategoryId', { videoCategoryId: getVideosQuery.videoCategoryId })
     }
-    if (getVideosQuery.region !== undefined) {
-      videos = videos.andWhere('regions.name = :region', { region: getVideosQuery.region })
+    if (getVideosQuery.regionId !== undefined) {
+      videos = videos.andWhere('regions.id = :regionId', { regionId: getVideosQuery.regionId })
     }
     if (getVideosQuery.filters !== undefined) {
       videos = videos.select(getVideosQuery.filters.map(filter => 'video.' + filter))
