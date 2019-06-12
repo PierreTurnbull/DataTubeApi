@@ -22,6 +22,11 @@ export class VideoService {
     if (getVideosQuery.regionId !== undefined) {
       videos = videos.andWhere('regions.id = :regionId', { regionId: getVideosQuery.regionId })
     }
+    if (getVideosQuery.range !== undefined) {
+      const range = getVideosQuery.range.split('-')
+      videos = videos.andWhere('viewCount >= :min', { min: range[0] })
+      videos = videos.andWhere('viewCount <= :max', { max: range[1] })
+    }
     if (getVideosQuery.filters !== undefined) {
       videos = videos.select(getVideosQuery.filters.map(filter => 'video.' + filter))
     }
