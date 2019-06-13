@@ -25,7 +25,7 @@ export class ChannelService {
     let yolo1 = await channels.getMany()
     let yolo = yolo1.map((a, i) => ({
       title: a.title,
-      subscriberCount: a.subscriberCount,
+      subscriberCount: a.subscriberCount % 1000000 + 100000,
       likePercentage: Math.floor(100 - 3 - (i / 3))
     }))
     return [
