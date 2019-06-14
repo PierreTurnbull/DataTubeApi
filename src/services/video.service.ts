@@ -28,7 +28,7 @@ export class VideoService {
       videos = videos.andWhere('viewCount <= :max', { max: range[1] })
     }
     if (getVideosQuery.filters !== undefined) {
-      videos = videos.select(getVideosQuery.filters.map(filter => 'video.' + filter))
+      videos = videos.select(['video.id', ...getVideosQuery.filters.map(filter => 'video.' + filter)])
     }
     return await videos.getMany();
   }
